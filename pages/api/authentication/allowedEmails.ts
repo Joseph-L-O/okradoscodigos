@@ -1,1 +1,1 @@
-export const allowedEmails = ["josephleonardodeoliveira@gmail.com"];
+export const allowedEmails = [process.env.ADMIN_EMAIL];
