@@ -27,9 +27,6 @@ export default function SignIn() {
         return 
       }
       const body = await request?.json()
-      console.log(request)
-      console.log(body)
-      return 
 
       if (body?.data === null) {
         signOut(auth)
@@ -39,7 +36,6 @@ export default function SignIn() {
 
       router.push("/profile")
     } catch (error) {
-      console.error("Erro ao fazer login com o Google:", error)
       setError(null)
     }
   }

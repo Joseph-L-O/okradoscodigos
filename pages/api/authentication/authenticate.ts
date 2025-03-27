@@ -1,18 +1,16 @@
-import { NextResponse } from "next/server"
 import { allowedEmails } from "./allowedEmails"
-import { NextApiRequest } from "next"
+import { NextApiRequest, NextApiResponse } from "next"
 
-export default async function Auth(req: NextApiRequest) {
+export default async function Auth(req: NextApiRequest, res: NextApiResponse) {
   const request = req.body
-  console.log(request)
   const user = request?.email || null
   
   if (!user) {
-    return null
+    return res.status(400)
   }
   if (!allowedEmails.includes(user || "")) {
-    return null
+    return res.status(403).json({error: "Not allowed"})
   }
 
-  return NextResponse.json({data: user})
+  return res.status(200).json({isAllowed: true})
 }

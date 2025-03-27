@@ -4,4 +4,6 @@ export type ArticleItem = {
     date: string;
     category: string;
     contentHtml: string;
+    createdAt?: string;
+    content?: string;
 };
