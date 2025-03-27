@@ -1,8 +1,10 @@
 import { useState } from "react"
 import { useRouter } from "next/router"
-import { auth, googleProvider, signInWithPopup } from "../../lib/firebase"
-import { allowedEmails } from "../api/auth/allowedEmails"
+import AuthGuard from "@/components/AuthGuard"
+import { GoogleAuthProvider, signOut } from "firebase/auth"
+import { auth, signInWithPopup } from "@/lib/firebase"
 
+const googleProvider = new GoogleAuthProvider()
 
 export default function SignIn() {
   const router = useRouter()
@@ -10,16 +12,31 @@ export default function SignIn() {
 
   const handleGoogleLogin = async () => {
     try {
-      const result = await signInWithPopup(auth, googleProvider)
-      const user = result.user
+      const userCredential = await signInWithPopup(auth, googleProvider)
+      const user = userCredential.user
+      const request = await fetch("/api/authentication/authenticate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: user.email }),
+      })
+      if(!request.ok) {
+        signOut(auth)
+        alert("Erro ao fazer login com o Google")
+        return 
+      }
+      const body = await request?.json()
+      console.log(request)
+      console.log(body)
+      return 
 
-      // Você pode adicionar verificações de permissão aqui, por exemplo, permitir apenas certos e-mails
-      if (!user.email || !allowedEmails.includes(user.email)) {
-        setError(null)
+      if (body?.data === null) {
+        signOut(auth)
+        alert("Erro ao fazer login com o Google")
         return
       }
 
-      // Se o login for bem-sucedido, redireciona para a página inicial
       router.push("/profile")
     } catch (error) {
       console.error("Erro ao fazer login com o Google:", error)
@@ -28,10 +45,12 @@ export default function SignIn() {
   }
 
   return (
-    <div>
-      <h1>Login</h1>
-      <button onClick={handleGoogleLogin}>Login com Google</button>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-    </div>
+    <AuthGuard requireAuth={false}>
+      <div>
+        <h1>Login</h1>
+        <button onClick={handleGoogleLogin}>Login com Google</button>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+      </div>
+    </AuthGuard>
   )
 }

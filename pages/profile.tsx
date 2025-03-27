@@ -1,27 +1,40 @@
-import { useSession, signOut } from "next-auth/react"
-import Image from "next/image"
-import { useRouter } from "next/router"
+"use client";
+import AuthGuard from "@/components/AuthGuard";
+import { auth } from "@/lib/firebase";
+import { User, onAuthStateChanged, signOut } from "firebase/auth";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
 export default function Profile() {
-    const { data: session } = useSession()
-    const router = useRouter()
+    const [user, setUser] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    if (!session) {
-        router.push("/auth/signin")
-        
-        return (
-            <div>
-                <h1>Você não está logado.</h1>
-                <p>Por favor, faça login para acessar seu perfil.</p>
-            </div>
-        )
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+            setLoading(false); // Define como falso quando o estado do usuário é carregado
+        });
+
+        return () => unsubscribe(); // Limpa o listener quando o componente é desmontado
+    }, []);
+
+    if (loading) {
+        // Exibe um indicador de carregamento enquanto o estado do usuário está sendo carregado
+        return <p>Carregando...</p>;
     }
 
     return (
-        <div>
-            <Image src={session?.user?.image || "/default-image.png"} alt="User Image" width={100} height={100} />
-            <p>Email: {session?.user?.email}</p>
-            <button onClick={() => signOut()}>Sair</button>
-        </div>
-    )
+        <AuthGuard requireAuth>
+            <div>
+                <Image
+                    src={user?.photoURL || "/default-image.png"}
+                    alt="User Image"
+                    width={100}
+                    height={100}
+                />
+                <p>Email: {user?.email}</p>
+                <button onClick={() => signOut(auth)}>Sair</button>
+            </div>
+        </AuthGuard>
+    );
 }
