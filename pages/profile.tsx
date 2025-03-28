@@ -1,6 +1,8 @@
 "use client";
 import AuthGuard from "@/components/AuthGuard";
+import { getCategoriesArticles } from "@/lib/articles";
 import { auth, database } from "@/lib/firebase";
+import { ArticleItem } from "@/types";
 import { User, onAuthStateChanged, signOut } from "firebase/auth";
 import { ref, push } from "firebase/database";
 import Image from "next/image";
@@ -10,13 +12,13 @@ export default function Profile() {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [file, setFile] = useState<File | null>(null);
-
+    const [articles, setArticles] = useState<Record<string, ArticleItem[]> | null>(null);
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
             setLoading(false); // Define como falso quando o estado do usuário é carregado
         });
-
+        getCategoriesArticles().then((articles) => setArticles(articles)); 
         return () => unsubscribe(); // Limpa o listener quando o componente é desmontado
     }, []);
 
@@ -67,6 +69,20 @@ export default function Profile() {
                 <button onClick={handleFileUpload} disabled={!file}>
                     Enviar
                 </button>
+
+                <h2>Artigos do Usuário</h2>
+                <ul>
+                    {articles &&
+                        Object.values(articles).flat().map((article) => (
+                            <li key={article.id}>
+                                <h3>{article.title}</h3>
+                                <p>{article.date}</p>
+                                <p>{article.category}</p>
+                                <button>Editar</button>
+                                <button>Excluir</button>
+                            </li>
+                        ))}
+                </ul>
             </div>
         </AuthGuard>
     );

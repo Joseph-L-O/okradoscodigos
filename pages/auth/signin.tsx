@@ -36,6 +36,7 @@ export default function SignIn() {
 
       router.push("/profile")
     } catch (error) {
+      console.error(error)
       setError(null)
     }
   }
