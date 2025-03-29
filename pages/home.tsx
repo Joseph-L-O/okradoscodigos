@@ -1,7 +1,7 @@
 import { useState, useEffect, SetStateAction } from "react";
 import HeaderNav from "@/components/HeaderNav";
 import Footer from "@/components/Footer";
-import BlogCard, { BlogPost } from "@/components/BlogCard";
+import BlogCard from "@/components/BlogCard";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -128,6 +128,7 @@ const Home = () => {
               {
                 categories.map((category, index) => (
                   <Link key={index} href="/category/technology" className="bg-white rounded-lg shadow p-8 text-center transition-transform hover:translate-y-[-5px]">
+                    <Image src={`${process.env.NEXT_PUBLIC_BASE_URL}/images/${category}.png}`} alt={category} width={100} height={100} className="w-16 h-16 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold mb-2 text-[#0f172a]">{category}</h3>
                     <p className="text-blog-[#334155]">
                       {`Explore the latest articles in ${category} category.`}
