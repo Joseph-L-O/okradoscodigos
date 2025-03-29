@@ -3,6 +3,9 @@ import { useRouter } from "next/router"
 import AuthGuard from "@/components/AuthGuard"
 import { GoogleAuthProvider, signOut } from "firebase/auth"
 import { auth, signInWithPopup } from "@/lib/firebase"
+import "../../app/globals.css"
+import { LogIn } from "lucide-react"
+
 
 const googleProvider = new GoogleAuthProvider()
 
@@ -21,10 +24,10 @@ export default function SignIn() {
         },
         body: JSON.stringify({ email: user.email }),
       })
-      if(!request.ok) {
+      if (!request.ok) {
         signOut(auth)
         alert("Erro ao fazer login com o Google")
-        return 
+        return
       }
       const body = await request?.json()
 
@@ -43,9 +46,9 @@ export default function SignIn() {
 
   return (
     <AuthGuard requireAuth={false}>
-      <div>
-        <h1>Login</h1>
-        <button onClick={handleGoogleLogin}>Login com Google</button>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <h1 className="text-3xl font-bold mb-4">Login</h1>
+        <button onClick={handleGoogleLogin} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex"> <LogIn className="h-6 w-6 mr-2" /> Login com Google</button>
         {error && <p style={{ color: "red" }}>{error}</p>}
       </div>
     </AuthGuard>

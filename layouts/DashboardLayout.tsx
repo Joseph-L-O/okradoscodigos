@@ -6,10 +6,11 @@ import {
     Tag,
     BarChart,
     X,
-    Home as HomeIcon
+    LogOut,
 } from "lucide-react";
 import Link from "next/link";
 import "../app/globals.css";
+import { HomeIcon } from "@heroicons/react/24/solid";
 
 const DashboardLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -23,13 +24,14 @@ const DashboardLayout = () => {
         { title: "Posts", path: "/dashboard/posts", icon: FileText },
         { title: "Categories", path: "/dashboard/categories", icon: Tag },
         { title: "Analytics", path: "/dashboard/analytics", icon: BarChart },
+        { title: "View Blog", path: "/", icon: HomeIcon },
     ];
 
     const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
     return (
         <div className="h-[100%] flex bg-background">
-            
+
             <aside
                 className={`bg-[#073246]  md:static md:translate-x-0 h-[100vh] z-30 transition-all duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
                     }`}
@@ -71,11 +73,11 @@ const DashboardLayout = () => {
                     </nav>
                     <div className="px-6 py-4 border-t border-sidebar-border">
                         <Link
-                            href="/"
+                            href="/dashboard/logout"
                             className="flex text-[#acacac] items-center text-sidebar-foreground hover:text-sidebar-accent-foreground transition-colors"
                         >
-                            <HomeIcon className="h-5 w-5 mr-3" />
-                            <span>View Blog</span>
+                            <LogOut className="h-5 w-5 mr-3" />
+                            <span>Sign Out</span>
                         </Link>
                     </div>
                 </div>

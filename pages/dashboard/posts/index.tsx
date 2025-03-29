@@ -135,7 +135,7 @@ const Posts = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex gap-3">
       <DashboardLayout />
-      <div className="absolute">
+      <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between md:items-center gap-2">
           <div>
             <h2 className="text-3xl font-bold tracking-tight">Posts</h2>
@@ -152,7 +152,7 @@ const Posts = () => {
                 className="pl-8 w-full md:w-[200px] lg:w-[300px]"
               />
             </div>
-            <Link href="/dashboard/posts/create">
+            <Link href="/dashboard/create-post">
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
                 New Post
@@ -188,7 +188,7 @@ const Posts = () => {
                       <tr key={post.id} className="border-b hover:bg-muted/50">
                         <td className="py-3 pr-4">
                           <div>
-                            <Link href={`/dashboard/posts/edit/${post.id}`} className="font-medium hover:underline">
+                            <Link href={`/dashboard/edit-post/${post.id}`} className="font-medium hover:underline">
                               {post.title}
                             </Link>
                             <p className="text-sm text-muted-foreground line-clamp-1 mt-1">
@@ -218,15 +218,15 @@ const Posts = () => {
                                 <span className="sr-only">Actions</span>
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
+                            <DropdownMenuContent className="bg-amber-50" align="end">
                               <DropdownMenuItem asChild>
-                                <Link href={`/post/${post.slug}`} className="flex items-center">
+                                <Link href={`/${post.slug}`} className="flex items-center">
                                   <Eye className="mr-2 h-4 w-4" />
                                   View
                                 </Link>
                               </DropdownMenuItem>
                               <DropdownMenuItem asChild>
-                                <Link href={`/dashboard/posts/edit/${post.id}`} className="flex items-center">
+                                <Link href={`/dashboard/edit-post/${post.id}`} className="flex items-center">
                                   <Edit className="mr-2 h-4 w-4" />
                                   Edit
                                 </Link>

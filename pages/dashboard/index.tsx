@@ -104,7 +104,7 @@ const Dashboard = () => {
 
     <div className="min-h-screen  max-h-[100vh] bg-gray-50 flex gap-3">
       <DashboardLayout />
-      <div className="p-6 w-full">
+      <div className="p-6 w-full max-h-[100vh] overflow-y-auto">
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card>
@@ -214,7 +214,7 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Recent Posts</CardTitle>
-            <Link href="/dashboard/posts/create">
+            <Link href="/dashboard/create-post">
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
                 New Post
