@@ -177,13 +177,14 @@ const Home = () => {
             <h2 className="text-2xl md:text-3xl font-bold mb-8 text-[#0f172a]">Explore by Category</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {
-
-                <Link href="/category/technology" className="bg-white rounded-lg shadow p-8 text-center transition-transform hover:translate-y-[-5px]">
-                  <h3 className="text-xl font-semibold mb-2 text-[#0f172a]">Technology</h3>
-                  <p className="text-blog-[#334155]">
-                    The latest in tech trends, innovations, and digital transformation.
-                  </p>
-                </Link>
+                categories.map((category, index) => (
+                  <Link key={index} href="/category/technology" className="bg-white rounded-lg shadow p-8 text-center transition-transform hover:translate-y-[-5px]">
+                    <h3 className="text-xl font-semibold mb-2 text-[#0f172a]">{category}</h3>
+                    <p className="text-blog-[#334155]">
+                      The latest in tech trends, innovations, and digital transformation.
+                    </p>
+                  </Link>
+                ))
               }
             </div>
           </div>

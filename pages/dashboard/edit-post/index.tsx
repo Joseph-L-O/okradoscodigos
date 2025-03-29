@@ -21,7 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Save } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import "../../app/globals.css";
+import "../../../app/globals.css";
 
 // Mock categories
 const categories = [
