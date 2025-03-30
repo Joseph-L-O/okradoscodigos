@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import HeaderNav from "@/components/HeaderNav";
 import Footer from "@/components/Footer";
-import BlogCard, { BlogPost } from "@/components/BlogCard";
+import BlogCard from "@/components/BlogCard";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { ArticleItem } from "@/types";
 
 // Mock categories data
 const categories = [
@@ -25,7 +26,7 @@ const categories = [
 ];
 
 // Mock posts by category
-const mockPostsByCategory: Record<string, BlogPost[]> = {
+const mockPostsByCategory: Record<string, ArticleItem[]> = {
   technology: [
     {
       id: 1,
@@ -104,7 +105,7 @@ const Category = () => {
   const params = useParams<{ slug: string }>();
   const slug = params?.slug || "";
   const [category, setCategory] = useState<typeof categories[0] | null>(null);
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [posts, setPosts] = useState<ArticleItem[]>([]);
   
   useEffect(() => {
     // In a real app, this would be an API call to fetch the category by slug
