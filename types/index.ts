@@ -1,5 +1,5 @@
 export type ArticleItem = {
-    id: number;
+    id: number | string;
     slug?: string;
     categorySlug?: string;
     excerpt?: string;
