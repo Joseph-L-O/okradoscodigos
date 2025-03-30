@@ -3,7 +3,7 @@ import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import { getArticleData } from '@/lib/articles';
 type tParams = Promise<{ slug: string }>;
 
-const Article = async (params: tParams) => {
+const Article = async (params: {params: tParams}) => {
     const { slug } = await params;
     const article = await getArticleData(slug);
     return (
