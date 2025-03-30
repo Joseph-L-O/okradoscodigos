@@ -3,8 +3,8 @@ import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import { getArticleData } from '@/lib/articles';
 type tParams = Promise<{ slug: string }>;
 
-const Article = async (params: {params: tParams}) => {
-    const { slug } = await params;
+const Article = async (props: {params: tParams}) => {
+    const { slug } = await props.params;
     const article = await getArticleData(slug);
     return (
         <section className='mx-auto w-11/12 md:w-10/12 lg:w-8/12 xl:w-7/12 mt-20 flex flex-col items-center gap-16 mb-20'>
