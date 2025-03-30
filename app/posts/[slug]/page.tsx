@@ -1,3 +1,4 @@
+"use client"
 import Link from 'next/link';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import { getArticleData } from '@/lib/articles';
