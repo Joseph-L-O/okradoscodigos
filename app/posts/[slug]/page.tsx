@@ -1,13 +1,12 @@
 import Link from 'next/link';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import { getArticleData } from '@/lib/articles';
-import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { ArticleItem } from '@/types';
+import { usePathname } from "next/navigation";
 
 const Article = () => {
-    const nxtrouter = useRouter()
-    const slug = nxtrouter.query.slug?.[0];
+    const slug = usePathname();
     const [article, setArticle] = useState<ArticleItem | null>(null);
     useEffect(() => {
         async function fetchData() {

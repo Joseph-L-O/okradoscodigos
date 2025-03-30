@@ -3,10 +3,11 @@ import HeaderNav from "@/components/HeaderNav";
 import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft } from "lucide-react";
-import BlogCard, { type BlogPost as BlogPostType } from "@/components/BlogCard";
-import { useParams } from "next/navigation";
+import BlogCard from "@/components/BlogCard";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { ArticleItem } from "@/types";
 
 // Mock data for a single blog post
 const mockPost = {
@@ -67,9 +68,9 @@ const mockPost = {
 };
 
 // Mock related posts
-const mockRelatedPosts: BlogPostType[] = [
+const mockRelatedPosts: ArticleItem[] = [
     {
-        id: 4,
+        id: "4",
         title: "Building Scalable Web Applications with Modern Architecture",
         excerpt: "An in-depth look at modern web architecture patterns that enable applications to scale efficiently.",
         slug: "scalable-web-applications-modern-architecture",
@@ -77,10 +78,10 @@ const mockRelatedPosts: BlogPostType[] = [
         category: "Technology",
         categorySlug: "technology",
         date: "April 28, 2023",
-        readTime: "10 min"
+        contentHtml: ""
     },
     {
-        id: 5,
+        id: "5",
         title: "The Psychology of Color in User Interface Design",
         excerpt: "Understand how color choices in UI design affect user perception, emotions, and decision-making.",
         slug: "psychology-color-ui-design",
@@ -88,10 +89,10 @@ const mockRelatedPosts: BlogPostType[] = [
         category: "Design",
         categorySlug: "design",
         date: "April 22, 2023",
-        readTime: "9 min"
+        contentHtml: ""
     },
     {
-        id: 6,
+        id: "6",
         title: "Sustainable Living: Small Changes with Big Impact",
         excerpt: "Discover simple, everyday changes you can make to live more sustainably and reduce your environmental footprint.",
         slug: "sustainable-living-small-changes-big-impact",
@@ -99,16 +100,15 @@ const mockRelatedPosts: BlogPostType[] = [
         category: "Lifestyle",
         categorySlug: "lifestyle",
         date: "April 15, 2023",
-        readTime: "5 min"
+        contentHtml: ""
     }
 ];
 
 const BlogPost = () => {
+    const slug = usePathname();
 
-    const params = useParams<{ slug: string }>();
-    const slug = params?.slug || "";
     const [post, setPost] = useState<typeof mockPost | null>(null);
-    const [relatedPosts, setRelatedPosts] = useState<BlogPostType[]>([]);
+    const [relatedPosts, setRelatedPosts] = useState<ArticleItem[]>([]);
 
     useEffect(() => {
         if (slug === mockPost.slug) {
