@@ -1,66 +1,126 @@
-import fs from "fs";
-import matter from "gray-matter";
-import path from "path";
+import { database } from "@/lib/firebase";
+import { ref, get } from "firebase/database";
 import moment from "moment";
-import {remark} from "remark";
+import type { ArticleItem } from "@/types";
+import matter from "gray-matter";
+import { remark } from "remark";
 import html from "remark-html";
 
-import type {ArticleItem} from "@/types";
+export const getAllArticles = async () => {
+    const articlesRef = ref(database, "articles");
+    const snapshot = await get(articlesRef);
 
-const articlesDirectory = path.join(process.cwd(), "articles");
+    if (!snapshot.exists()) {
+        return [];
+    }
 
-export const getArticles = (): ArticleItem[] => {
-    const fileNames = fs.readdirSync(articlesDirectory);
-    const allArticlesData = fileNames.map((fileName) => {
-        const id = fileName.replace(/\.md$/, "");
-        const fullPath = path.join(articlesDirectory, fileName);
-        const fileContents = fs.readFileSync(fullPath, "utf8");
-        const {data} = matter(fileContents);
-        return {
-            id,
-            title: data.title,
-            date: moment(data.date).format("MMMM D, YYYY"),
-            category: data.category,
-            contentHtml: data.content,
-        };
+    const articlesData: Record<string, Record<string, ArticleItem>> = snapshot.val();
+    const allArticlesData: ArticleItem[] = [];
+
+    Object.keys(articlesData).forEach((userId) => {
+        const userArticles = articlesData[userId];
+        Object.keys(userArticles).forEach(async (articleId) => {
+            const article = userArticles[articleId];
+            const { data, content } = matter(Buffer.from(article.content || ""));
+            const processedContent = await remark().use(html).process(content);
+            const contentHtml = processedContent.toString();
+            allArticlesData.push({
+                id: articleId,
+                title: data.title,
+                date: moment(data.createdAt).format("MMMM D, YYYY"),
+                category: data.category || "Uncategorized",
+                contentHtml: contentHtml || "",
+                createdAt: article.createdAt,
+            });
+        });
     });
+
     return allArticlesData.sort((a, b) => {
-        const format = "DD-MM-YYYY";
-        const dateOne = moment(a.date, format);
-        const dateTwo = moment(b.date, format);
-        if(dateOne.isBefore(dateTwo)) {
+        const dateOne = moment(a.date, "MMMM D, YYYY");
+        const dateTwo = moment(b.date, "MMMM D, YYYY");
+        if (dateOne.isBefore(dateTwo)) {
             return -1;
         }
-        if(dateTwo.isAfter(dateOne)) {
+        return 1;
+    });
+};
+export const getArticles = async (): Promise<ArticleItem[]> => {
+    const articlesRef = ref(database, "articles");
+    const snapshot = await get(articlesRef);
+
+    if (!snapshot.exists()) {
+        return [];
+    }
+
+    const articlesData: Record<string, Record<string, ArticleItem>> = snapshot.val();
+    const allArticlesData: ArticleItem[] = [];
+
+    Object.keys(articlesData).forEach((userId) => {
+        const userArticles = articlesData[userId];
+        Object.keys(userArticles).forEach(async (articleId) => {
+            const article = userArticles[articleId];
+            const { data } = matter(Buffer.from(article.content || ""));
+            allArticlesData.push({
+                id: articleId,
+                title: data.title,
+                date: moment(data.createdAt).format("MMMM D, YYYY"),
+                category: data.category || "Uncategorized",
+                contentHtml: "",
+                createdAt: article.createdAt,
+            });
+        });
+    });
+
+    return allArticlesData.sort((a, b) => {
+        const dateOne = moment(a.date, "MMMM D, YYYY");
+        const dateTwo = moment(b.date, "MMMM D, YYYY");
+        if (dateOne.isBefore(dateTwo)) {
+            return -1;
+        }
+        if (dateTwo.isAfter(dateOne)) {
             return 1;
         }
         return 0;
     });
 };
 
-export const getCategoriesArticles = (): Record<string, ArticleItem[]> => {
-    const sortedArticles = getArticles();
+export const getCategoriesArticles = async (): Promise<Record<string, ArticleItem[]>> => {
+    const sortedArticles = await getArticles();
     const categorisedArticles: Record<string, ArticleItem[]> = {};
+
     sortedArticles.forEach((article) => {
-        if(!categorisedArticles[article.category]) {
+        if (!categorisedArticles[article.category]) {
             categorisedArticles[article.category] = [];
         }
         categorisedArticles[article.category].push(article);
     });
-    return categorisedArticles;
-}
 
-export const getArticleData = async (id: string): Promise<ArticleItem> => {
-    const fullPath = path.join(articlesDirectory, `${decodeURI(id)}.md`);
-    const fileContents = fs.readFileSync(fullPath, "utf8");
-    const {data, content } = matter(fileContents);
+    return categorisedArticles;
+};
+
+
+
+export const getArticleData = async (id: string): Promise<ArticleItem | null> => {
+    const articleRef = ref(database, `articles/${process.env.NEXT_PUBLIC_FIREBASE_USER_ID}/${id}`);
+    const snapshot = await get(articleRef);
+
+
+
+    if (!snapshot.exists()) {
+        return null;
+    }
+
+    const article = snapshot.val();
+    console.log(article)
+    const { content } = matter(Buffer.from(article?.content || ""));
     const processedContent = await remark().use(html).process(content);
     const contentHtml = processedContent.toString();
+
     return {
         id,
-        title: data.title,
-        date: moment(data.date, "DD-MM-YYYY").format("MMMM D, YYYY"),
-        category: data.category,
-        contentHtml,
+        title: article.title,
+        date: moment(article.createdAt).format("MMMM D, YYYY"),
+        category: article.category || "Uncategorized",
+        contentHtml: contentHtml,
     };
 };
