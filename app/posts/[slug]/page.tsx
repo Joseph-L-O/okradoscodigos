@@ -1,10 +1,20 @@
 import Link from 'next/link';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 import { getArticleData } from '@/lib/articles';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { ArticleItem } from '@/types';
 
-const Article = async ({ params }: { params: { slug: string } }) => {
-    const { slug } = await params;
-    const article = await getArticleData(slug);
+const Article = () => {
+    const nxtrouter = useRouter()
+    const slug = nxtrouter.query.slug?.[0];
+    const [article, setArticle] = useState<ArticleItem | null>(null);
+    useEffect(() => {
+        async function fetchData() {
+            setArticle(await getArticleData(slug || ""))
+        }
+        fetchData()
+    }, [slug])
     return (
         <section className='mx-auto w-11/12 md:w-10/12 lg:w-8/12 xl:w-7/12 mt-20 flex flex-col items-center gap-16 mb-20'>
             <header className='font-cormorant-garamond font-light text-6xl text-neutral-900 text-center'>
@@ -16,7 +26,7 @@ const Article = async ({ params }: { params: { slug: string } }) => {
                     <span>Voltar</span>
                 </Link>
                 <p>{article?.date.toString()}</p>
-                <article className='article' dangerouslySetInnerHTML={{ __html: article?.contentHtml || ""}} />
+                <article className='article' dangerouslySetInnerHTML={{ __html: article?.contentHtml || "" }} />
             </div>
 
         </section>

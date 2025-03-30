@@ -20,6 +20,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useRouter as useNextRouter } from "next/router";
 import "../../../../app/globals.css";
 import DashboardLayout from "@/layouts/DashboardLayout";
 
@@ -43,9 +44,10 @@ const mockPost = {
     date: "May 15, 2023"
 };
 
-const EditPost = ({ params }: { params: { slug: string } }) => {
-    console.log(params);
-    const { slug } = params;
+const EditPost = () => {
+    const nxtrouter = useNextRouter()
+
+    const slug = nxtrouter.query.slug;
     const router = useRouter();
     const { toast } = useToast();
 

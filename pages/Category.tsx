@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import HeaderNav from "@/components/HeaderNav";
 import Footer from "@/components/Footer";
-import BlogCard, { BlogPost } from "@/components/BlogCard";
+import BlogCard from "@/components/BlogCard";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import { ArticleItem } from "@/types";
 
 // Mock categories data
 const categories = [
@@ -25,10 +26,10 @@ const categories = [
 ];
 
 // Mock posts by category
-const mockPostsByCategory: Record<string, BlogPost[]> = {
+const mockPostsByCategory: Record<string, ArticleItem[]> = {
   technology: [
     {
-      id: 1,
+      id: "1",
       title: "The Future of Web Development: Trends to Watch in 2023",
       excerpt: "Explore the cutting-edge technologies and methodologies shaping the landscape of web development in the coming year.",
       slug: "future-web-development-trends-2023",
@@ -36,10 +37,10 @@ const mockPostsByCategory: Record<string, BlogPost[]> = {
       category: "Technology",
       categorySlug: "technology",
       date: "May 15, 2023",
-      readTime: "8 min"
+      contentHtml: ""
     },
     {
-      id: 4,
+      id: "4",
       title: "Building Scalable Web Applications with Modern Architecture",
       excerpt: "An in-depth look at modern web architecture patterns that enable applications to scale efficiently.",
       slug: "scalable-web-applications-modern-architecture",
@@ -47,12 +48,12 @@ const mockPostsByCategory: Record<string, BlogPost[]> = {
       category: "Technology",
       categorySlug: "technology",
       date: "April 28, 2023",
-      readTime: "10 min"
+      contentHtml: ""
     }
   ],
   design: [
     {
-      id: 2,
+      id: "2",
       title: "Minimalist Design Principles for Modern Interiors",
       excerpt: "Discover how the principles of minimalist design can transform your living space into a serene and functional environment.",
       slug: "minimalist-design-principles-modern-interiors",
@@ -60,10 +61,10 @@ const mockPostsByCategory: Record<string, BlogPost[]> = {
       category: "Design",
       categorySlug: "design",
       date: "May 10, 2023",
-      readTime: "6 min"
+      contentHtml: ""
     },
     {
-      id: 5,
+      id: "5",
       title: "The Psychology of Color in User Interface Design",
       excerpt: "Understand how color choices in UI design affect user perception, emotions, and decision-making.",
       slug: "psychology-color-ui-design",
@@ -71,12 +72,12 @@ const mockPostsByCategory: Record<string, BlogPost[]> = {
       category: "Design",
       categorySlug: "design",
       date: "April 22, 2023",
-      readTime: "9 min"
+      contentHtml: ""
     }
   ],
   lifestyle: [
     {
-      id: 3,
+      id: "3",
       title: "Digital Detox: How to Create Healthy Tech Boundaries",
       excerpt: "Learn practical strategies for establishing boundaries with technology to improve your mental health and productivity.",
       slug: "digital-detox-healthy-tech-boundaries",
@@ -84,10 +85,10 @@ const mockPostsByCategory: Record<string, BlogPost[]> = {
       category: "Lifestyle",
       categorySlug: "lifestyle",
       date: "May 5, 2023",
-      readTime: "7 min"
+      contentHtml: ""
     },
     {
-      id: 6,
+      id: '6',
       title: "Sustainable Living: Small Changes with Big Impact",
       excerpt: "Discover simple, everyday changes you can make to live more sustainably and reduce your environmental footprint.",
       slug: "sustainable-living-small-changes-big-impact",
@@ -95,7 +96,7 @@ const mockPostsByCategory: Record<string, BlogPost[]> = {
       category: "Lifestyle",
       categorySlug: "lifestyle",
       date: "April 15, 2023",
-      readTime: "5 min"
+      contentHtml: ""
     }
   ]
 };
@@ -104,7 +105,7 @@ const Category = () => {
   const params = useParams<{ slug: string }>();
   const slug = params?.slug || "";
   const [category, setCategory] = useState<typeof categories[0] | null>(null);
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [posts, setPosts] = useState<ArticleItem[]>([]);
   
   useEffect(() => {
     // In a real app, this would be an API call to fetch the category by slug

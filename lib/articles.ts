@@ -26,6 +26,10 @@ export const getAllArticles = async () => {
             const contentHtml = processedContent.toString();
             allArticlesData.push({
                 id: articleId,
+                coverImage: data.coverImage,
+                excerpt: data.excerpt,
+                slug: data.slug,
+                categorySlug: data.categorySlug,
                 title: data.title,
                 date: moment(data.createdAt).format("MMMM D, YYYY"),
                 category: data.category || "Uncategorized",
@@ -62,6 +66,10 @@ export const getArticles = async (): Promise<ArticleItem[]> => {
             const { data } = matter(Buffer.from(article.content || ""));
             allArticlesData.push({
                 id: articleId,
+                coverImage: data.coverImage,
+                excerpt: data.excerpt,
+                slug: data.slug,
+                categorySlug: data.categorySlug,
                 title: data.title,
                 date: moment(data.createdAt).format("MMMM D, YYYY"),
                 category: data.category || "Uncategorized",
@@ -118,6 +126,10 @@ export const getArticleData = async (id: string): Promise<ArticleItem | null> =>
 
     return {
         id,
+        coverImage: article.coverImage,
+        excerpt: article.excerpt,
+        slug: article.slug,
+        categorySlug: article.categorySlug,
         title: article.title,
         date: moment(article.createdAt).format("MMMM D, YYYY"),
         category: article.category || "Uncategorized",
