@@ -1,5 +1,3 @@
-import { database } from "@/lib/firebase";
-import { ref, get } from "firebase/database";
 import moment from "moment";
 import type { ArticleItem } from "@/types";
 import matter from "gray-matter";
@@ -7,8 +5,6 @@ import { remark } from "remark";
 import html from "remark-html";
 
 export const getAllArticles = async () => {
-    const articlesRef = ref(database, "articles");
-    const snapshot = await get(articlesRef);
 
     if (!snapshot.exists()) {
         return [];

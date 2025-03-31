@@ -1,4 +1,3 @@
-import { set, ref, getDatabase } from "firebase/database"
 import { NextApiRequest, NextApiResponse } from "next"
 
 // create a new post in the database
@@ -9,9 +8,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     }
     if (!req.body) {
         return res.status(400).json({ error: 'No data' })
-    }
-    if (!req.body.user.email.includes(process.env.ADMIN_EMAIL || "")) {
-        return res.status(403).json({ error: 'Not allowed' })
     }
     if (!req.body.title || !req.body.content || !req.body.slug || !req.body.category) {
         return res.status(400).json({ error: 'Missing title or content' })
@@ -27,9 +23,9 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         views: 0,
         slug: req.body.slug,
         author: req.body.user.name,
-    }
+    } 
 
-    set(ref(getDatabase(), `posts/${post.id}`), post)
+
 
     res.status(200).json(post)
 }
