@@ -1,18 +1,17 @@
 export type ArticleItem = {
-    id: number | string;
+    id: string;
     slug?: string;
     categorySlug?: string;
     excerpt?: string;
     coverImage?: string;
-    excerpt: string;
-    slug: string;
-    categorySlug: string;
     title: string;
     date: string;
     category: string;
     contentHtml?: string;
     createdAt?: string;
     content?: string;
+    tags?: string[];
+    author?: string;
     readTime?: string;
 };
 

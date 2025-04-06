@@ -24,7 +24,7 @@ interface BlogCardProps {
 const BlogCard = ({ post, featured = false }: BlogCardProps) => {
   return (
     <Card className={`overflow-hidden transition-shadow hover:shadow-md ${featured ? 'h-full' : ''}`}>
-      <Link href={`/post/${post.id}`}>
+      <Link href={`/blogpost/${post.slug}`}>
         <div className="relative aspect-video overflow-hidden">
           <Image 
             src={post.coverImage || 'https://dummyimage.com/800x450/000/fff'} 
@@ -43,13 +43,13 @@ const BlogCard = ({ post, featured = false }: BlogCardProps) => {
             </Badge>
           </Link>
         </div>
-        <Link href={`/post/${post.id}`}>
+        <Link href={`/blogpost/${post.slug}`}>
           <h3 className={`font-semibold text-[#0f172a] hover:text-[#0ea5e9] transition-colors ${featured ? 'text-2xl' : 'text-xl'}`}>
             {post.title}
           </h3>
         </Link>
         <p className="text-blog-[#334155]">
-          {post.content?.slice(0, 100)}...
+          {post.excerpt?.slice(0, 100)}
         </p>
       </CardContent>
       <CardFooter className="px-5 py-4 text-sm text-muted-foreground border-t flex justify-between">
