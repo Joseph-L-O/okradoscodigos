@@ -1,5 +1,8 @@
 export type ArticleItem = {
-    id: string;
+    id: number | string;
+    slug?: string;
+    categorySlug?: string;
+    excerpt?: string;
     coverImage?: string;
     excerpt: string;
     slug: string;
@@ -7,9 +10,10 @@ export type ArticleItem = {
     title: string;
     date: string;
     category: string;
-    contentHtml: string;
+    contentHtml?: string;
     createdAt?: string;
     content?: string;
+    readTime?: string;
 };
 
 export type Params = { params: { slug: string } }
