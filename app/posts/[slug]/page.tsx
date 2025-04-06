@@ -1,17 +1,15 @@
 "use client"
 import Link from 'next/link';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
-import { getArticleData } from '@/lib/articles';
 import { useEffect, useState } from 'react';
 import { ArticleItem } from '@/types';
 import { usePathname } from "next/navigation";
 
 const Article = () => {
     const slug = usePathname();
-    const [article, setArticle] = useState<ArticleItem | null>(null);
+    const [article] = useState<ArticleItem | null>(null);
     useEffect(() => {
         async function fetchData() {
-            setArticle(await getArticleData(slug || ""))
         }
         fetchData()
     }, [slug])
