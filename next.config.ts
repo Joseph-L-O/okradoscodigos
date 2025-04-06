@@ -21,6 +21,12 @@ const nextConfig: NextConfig = {
         hostname: 'dummyimage.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'sujyouhtdbbubtdgspjk.supabase.co',
+        port: '',
+        pathname: '/**',
       }
     ],
   },

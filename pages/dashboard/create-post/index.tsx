@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Card,
     CardContent,
@@ -22,25 +22,49 @@ import { ArrowLeft, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import "../../../app/globals.css";
 import DashboardLayout from "@/layouts/DashboardLayout";
+import Image from "next/image";
 
-// Mock categories
-const categories = [
-    { value: "technology", label: "Technology" },
-    { value: "design", label: "Design" },
-    { value: "lifestyle", label: "Lifestyle" }
-];
+
+
+type FormData = {
+    slug?: string;
+    categorySlug?: string;
+    excerpt?: string;
+    coverImage?: string;
+    title: string;
+    date: string;
+    category: string;
+    contentHtml?: string;
+    createdAt?: string;
+    content?: string;
+    tags?: string[];
+    author?: string;
+};
 
 const CreatePost = () => {
     const { toast } = useToast();
     const router = useRouter();
 
-    const [formData, setFormData] = useState({
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        fetch("/api/categories")
+            .then((res) => res.json())
+            .then((data) => setCategories(data));
+    }, []);
+
+
+    const [formData, setFormData] = useState<FormData>({
         title: "",
         slug: "",
         category: "",
         excerpt: "",
+        coverImage: "",
         content: "",
-        coverImage: ""
+        date: new Date().toISOString(),
+        categorySlug: "",
+        author: "Joseph",
+        tags: [],
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -62,6 +86,17 @@ const CreatePost = () => {
                 title: value,
                 slug
             });
+        } else if (name === "category") {
+            const categorySlug = value
+                .toLowerCase()
+                .replace(/[^\w\s]/gi, '')
+                .replace(/\s+/g, '-');
+
+            setFormData({
+                ...formData,
+                category: value,
+                categorySlug
+            });
         } else {
             setFormData({
                 ...formData,
@@ -82,7 +117,7 @@ const CreatePost = () => {
         setIsSubmitting(true);
 
         // Validate form
-        if (!formData.title || !formData.category || !formData.content) {
+        if (!formData.title || !formData.category || !formData.content || !formData.slug || !formData.excerpt || !formData.coverImage) {
             toast({
                 title: "Error",
                 description: "Please fill in all required fields.",
@@ -92,14 +127,44 @@ const CreatePost = () => {
         }
 
         // In a real app, this would be an API call to create the post
-        setTimeout(() => {
-            toast({
-                title: "Success",
-                description: "Post created successfully!",
-            });
-            setIsSubmitting(false);
-            router.push("/dashboard/posts");
-        }, 1000);
+        console.log("Creating post...", formData);
+
+        fetch("/api/create/post", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            body: JSON.stringify({
+                ...formData,
+                contentHtml: formData.content,
+            }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.error) {
+                    toast({
+                        title: "Error",
+                        description: data.error,
+                    });
+                    setIsSubmitting(false);
+                    return;
+                }
+                toast({
+                    title: "Success",
+                    description: "Post created successfully.",
+                });
+                setIsSubmitting(false);
+                router.push("/dashboard/posts");
+            })
+            .catch((error) => {
+                toast({
+                    title: "Error",
+                    description: error.message,
+                });
+                setIsSubmitting(false);
+            })
+
     };
 
     return (
@@ -125,7 +190,7 @@ const CreatePost = () => {
                         <CardContent className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <Label htmlFor="title">Title <span className="text-destructive">*</span></Label>
+                                    <Label htmlFor="title">Title <span className="text-[red]">*</span></Label>
                                     <Input
                                         id="title"
                                         name="title"
@@ -137,7 +202,7 @@ const CreatePost = () => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="slug">Slug <span className="text-destructive">*</span></Label>
+                                    <Label htmlFor="slug">Slug <span className="text-[red]">*</span></Label>
                                     <Input
                                         id="slug"
                                         name="slug"
@@ -151,19 +216,22 @@ const CreatePost = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <Label htmlFor="category">Category <span className="text-destructive">*</span></Label>
+                                    <Label htmlFor="category">Category <span className="text-[red]">*</span></Label>
+                                    {/* create a writable select component */}
                                     <Select
-                                        value={formData.category}
+                                        name="category"
                                         onValueChange={handleSelectChange}
+                                        defaultValue={formData.category}
                                         required
                                     >
-                                        <SelectTrigger id="category">
+                                        <SelectTrigger>
                                             <SelectValue placeholder="Select category" />
                                         </SelectTrigger>
-                                        <SelectContent>
-                                            {categories.map(category => (
+                                        <SelectContent className="w-64 bg-white">
+                                            {categories.map((category: { label: string, value: string }) => (
                                                 <SelectItem
-                                                    key={category.value}
+                                                    className="cursor-pointer hover:bg-gray-100"
+                                                    key={category?.value}
                                                     value={category.value}
                                                 >
                                                     {category.label}
@@ -172,21 +240,43 @@ const CreatePost = () => {
                                         </SelectContent>
                                     </Select>
                                 </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="coverImage">Cover Image URL</Label>
-                                    <Input
-                                        id="coverImage"
-                                        name="coverImage"
-                                        value={formData.coverImage}
-                                        onChange={handleInputChange}
-                                        placeholder="https://example.com/image.jpg"
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="coverImage">Cover Image</Label>
+                                <Input
+                                    type="file"
+                                    id="coverImage"
+                                    name="coverImage"
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            file.arrayBuffer().then((buffer) => {
+                                                const base64String = btoa(
+                                                    new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
+                                                );
+                                                setFormData({
+                                                    ...formData,
+                                                    coverImage: base64String
+                                                });
+                                            })
+                                        }
+                                    }}
+                                    placeholder="Upload cover image"
+                                />
+                                {formData.coverImage && (
+                                    <Image
+                                        src={`data:image/jpeg;base64,${formData.coverImage}`}
+                                        alt="Cover Preview"
+                                        width={500}
+                                        height={300}
+                                        className="mt-2 h-full w-full object-cover rounded-md"
                                     />
-                                </div>
+                                )}
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="excerpt">Excerpt</Label>
+                                <Label htmlFor="excerpt">Excerpt <span className="text-[red]">*</span></Label>
                                 <Textarea
                                     id="excerpt"
                                     name="excerpt"
@@ -198,7 +288,7 @@ const CreatePost = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="content">Content <span className="text-destructive">*</span></Label>
+                                <Label htmlFor="content">Content <span className="text-[red]">*</span></Label>
                                 <Textarea
                                     id="content"
                                     name="content"
@@ -207,6 +297,22 @@ const CreatePost = () => {
                                     placeholder="Write your post content here..."
                                     rows={10}
                                     required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="tags">Tags</Label>
+                                <Input
+                                    id="tags"
+                                    name="tags"
+                                    value={formData.tags?.join(", ")}
+                                    onChange={(e) => {
+                                        const tags = e.target.value.split(",").map(tag => tag.trim());
+                                        setFormData({
+                                            ...formData,
+                                            tags
+                                        });
+                                    }}
+                                    placeholder="Enter tags separated by commas"
                                 />
                             </div>
                         </CardContent>
@@ -228,6 +334,7 @@ const CreatePost = () => {
                                 </Button>
                                 <Button
                                     type="submit"
+                                    className="bg-blue-600 text-white hover:bg-blue-700"
                                     disabled={isSubmitting}
                                 >
                                     <Save className="mr-2 h-4 w-4" />
