@@ -4,6 +4,9 @@ export type ArticleItem = {
     categorySlug?: string;
     excerpt?: string;
     coverImage?: string;
+    excerpt: string;
+    slug: string;
+    categorySlug: string;
     title: string;
     date: string;
     category: string;
@@ -12,3 +15,5 @@ export type ArticleItem = {
     content?: string;
     readTime?: string;
 };
+
+export type Params = { params: { slug: string } }

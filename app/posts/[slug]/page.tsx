@@ -1,11 +1,18 @@
+"use client"
 import Link from 'next/link';
 import { ArrowLeftIcon } from '@heroicons/react/24/solid';
-import { getArticleData } from '@/lib/articles';
-type tParams = Promise<{ slug: string }>;
+import { useEffect, useState } from 'react';
+import { ArticleItem } from '@/types';
+import { usePathname } from "next/navigation";
 
-const Article = async (props: {params: tParams}) => {
-    const { slug } = await props.params;
-    const article = await getArticleData(slug);
+const Article = () => {
+    const slug = usePathname();
+    const [article] = useState<ArticleItem | null>(null);
+    useEffect(() => {
+        async function fetchData() {
+        }
+        fetchData()
+    }, [slug])
     return (
         <section className='mx-auto w-11/12 md:w-10/12 lg:w-8/12 xl:w-7/12 mt-20 flex flex-col items-center gap-16 mb-20'>
             <header className='font-cormorant-garamond font-light text-6xl text-neutral-900 text-center'>
@@ -17,7 +24,7 @@ const Article = async (props: {params: tParams}) => {
                     <span>Voltar</span>
                 </Link>
                 <p>{article?.date.toString()}</p>
-                <article className='article' dangerouslySetInnerHTML={{ __html: article?.contentHtml || ""}} />
+                <article className='article' dangerouslySetInnerHTML={{ __html: article?.contentHtml || "" }} />
             </div>
 
         </section>

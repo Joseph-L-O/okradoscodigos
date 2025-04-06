@@ -3,10 +3,11 @@ import HeaderNav from "@/components/HeaderNav";
 import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft } from "lucide-react";
-import BlogCard, { type BlogPost as BlogPostType } from "@/components/BlogCard";
-import { useParams } from "next/navigation";
+import BlogCard from "@/components/BlogCard";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { ArticleItem } from "@/types";
 
 // Mock data for a single blog post
 const mockPost = {
@@ -67,9 +68,9 @@ const mockPost = {
 };
 
 // Mock related posts
-const mockRelatedPosts: BlogPostType[] = [
+const mockRelatedPosts: ArticleItem[] = [
     {
-        id: 4,
+        id: "4",
         title: "Building Scalable Web Applications with Modern Architecture",
         excerpt: "An in-depth look at modern web architecture patterns that enable applications to scale efficiently.",
         slug: "scalable-web-applications-modern-architecture",
@@ -77,10 +78,10 @@ const mockRelatedPosts: BlogPostType[] = [
         category: "Technology",
         categorySlug: "technology",
         date: "April 28, 2023",
-        readTime: "10 min"
+        contentHtml: ""
     },
     {
-        id: 5,
+        id: "5",
         title: "The Psychology of Color in User Interface Design",
         excerpt: "Understand how color choices in UI design affect user perception, emotions, and decision-making.",
         slug: "psychology-color-ui-design",
@@ -88,10 +89,10 @@ const mockRelatedPosts: BlogPostType[] = [
         category: "Design",
         categorySlug: "design",
         date: "April 22, 2023",
-        readTime: "9 min"
+        contentHtml: ""
     },
     {
-        id: 6,
+        id: "6",
         title: "Sustainable Living: Small Changes with Big Impact",
         excerpt: "Discover simple, everyday changes you can make to live more sustainably and reduce your environmental footprint.",
         slug: "sustainable-living-small-changes-big-impact",
@@ -99,28 +100,33 @@ const mockRelatedPosts: BlogPostType[] = [
         category: "Lifestyle",
         categorySlug: "lifestyle",
         date: "April 15, 2023",
-        readTime: "5 min"
+        contentHtml: ""
     }
 ];
 
 const BlogPost = () => {
+    const slug = usePathname();
 
-    const params = useParams<{ slug: string }>();
-    const slug = params?.slug || "";
     const [post, setPost] = useState<typeof mockPost | null>(null);
-    const [relatedPosts, setRelatedPosts] = useState<BlogPostType[]>([]);
-
+    const [relatedPosts, setRelatedPosts] = useState<ArticleItem[]>([]);
+    console.log("slug", slug);
+    console.log("post", post);
     useEffect(() => {
-        if (slug === mockPost.slug) {
+        if (slug?.replace("/blogpost/", "") === mockPost.slug) {
             setPost(mockPost);
             setRelatedPosts(mockRelatedPosts);
-        } else {
-            window.location.href = "/404";
         }
     }, [slug]);
 
     if (!post) {
-        return <div className="flex items-center justify-center h-screen">Loading...</div>;
+        return <div className="flex items-center justify-center h-screen flex-col">
+            <svg className="animate-bounce h-10 w-10 text-blue-500" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 1 1 16 0A8 8 0 0 1 4 12zm2.5-3h11a2.5 2.5 0 0 1 0 5h-11a2.5 2.5 0 0 1 0-5z"></path>
+                <path className="opacity-75" fill="currentColor" d="M12 4a8 8 0 1 1 0 16A8 8 0 0 1 12 4zm0-2a10 10 0 1 0 0 20A10 10 0 0 0 12 2z"></path>
+            </svg>
+            <span className="text-gray-500">Loading</span>
+        </div>;
     }
 
     return (
@@ -152,6 +158,8 @@ const BlogPost = () => {
                             <Image
                                 src={post.coverImage}
                                 alt={post.title}
+                                width={1600}
+                                height={900}
                                 className="w-full h-full object-cover"
                             />
                         </div>

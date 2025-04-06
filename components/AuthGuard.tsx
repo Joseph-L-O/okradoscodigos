@@ -1,7 +1,6 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { auth } from '@/lib/firebase'
 
 export default function AuthGuard({ children, requireAuth = true }: { children: React.ReactNode, requireAuth?: boolean }) {
     const router = useRouter()
@@ -9,9 +8,11 @@ export default function AuthGuard({ children, requireAuth = true }: { children: 
     const [isAllowed, setIsAllowed] = useState(false)
 
     useEffect(() => {
-        const user = auth.currentUser
+        const access_token = localStorage.getItem('access_token')
+        const expires_at = localStorage.getItem('expires_at')
+        const refresh_token = localStorage.getItem('refresh_token')
 
-        if (!user) {
+        if (!access_token) {
             // Redireciona para a página de login se o usuário não estiver autenticado
             if (requireAuth) {
                 router.push('/auth/signin')
@@ -19,39 +20,49 @@ export default function AuthGuard({ children, requireAuth = true }: { children: 
             setLoading(false)
             return
         }
-
-        // Verifica a autorização do usuário através da API
-        fetch("/api/authentication/authenticate", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email: user.email }),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("API returned an error")
-                }
-                return response.json()
+        if (expires_at && new Date(expires_at) < new Date()) {
+            // Redireciona para a página de login se o token estiver expirado
+            if (requireAuth) {
+                router.push('/auth/signin')
+            }
+            setLoading(false)
+            return
+        }
+        if (refresh_token && (+new Date(expires_at || "")) - (+new Date()) < 15 * 60 * 1000 &&
+            new Date(expires_at || "") > new Date()) {
+            // Atualiza o token se estiver prestes a expirar e não estiver expirado
+            fetch("/api/authentication/refresh", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ refresh_token }),
             })
-            .then((body) => {
-                if (body?.isAllowed) {
-                    setIsAllowed(true)
-                } else {
-                    setIsAllowed(false)
+                .then((response) => response.json())
+                .then(({ data }: { data: { access_token: string, expires_at: string, refresh_token: string } }) => {
+                    localStorage.setItem('access_token', data.access_token)
+                    localStorage.setItem('expires_at', data.expires_at)
+                    localStorage.setItem('refresh_token', data.refresh_token)
+                })
+                .catch(() => {
                     if (requireAuth) {
-                        router.push('/auth/signin') // Redireciona para login se não autorizado
+                        router.push('/auth/signin')
                     }
-                }
-            })
-            .catch(() => {
-                if (requireAuth) {
-                    router.push('/auth/signin') // Redireciona para login em caso de erro
-                }
-            })
-            .finally(() => {
-                setLoading(false)
-            })
+                })
+                .finally(() => {
+                    setLoading(false)
+                    return
+                })
+        }
+        // Redireciona para a página de perfil se o usuário estiver logado e tentar acessar a página de login
+        if (!requireAuth && window.location.pathname === '/auth/signin' && access_token) {
+            router.push('/profile')
+            setLoading(false)
+            return
+        }
+
+        setIsAllowed(true)
+        setLoading(false)
     }, [requireAuth, router])
 
     if (loading) {
