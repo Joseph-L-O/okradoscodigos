@@ -61,6 +61,18 @@ const HeaderNav = () => {
           >
             Home
           </Link>
+          <Link
+            href="/sobre"
+            className="text-blog-[#334155] hover:text-[#0f172a] transition-colors font-medium"
+          >
+            Sobre
+          </Link>
+          <Link
+            href="/categorias"
+            className="text-blog-[#334155] hover:text-[#0f172a] transition-colors font-medium"
+          >
+            categorias
+          </Link>
           <Command className="flex flex-col w-full h-[600px]">
             <CommandInput className="w-[200px] fixed top-[15px]" placeholder="🔍 Search..." onValueChange={(e) => setSearchTerm(e)} />
             <CommandList className="relative top-[300px] w-full h-[600px] z-10 shadow-lg">
@@ -101,6 +113,18 @@ const HeaderNav = () => {
                 onClick={toggleMenu}
               >
                 Home
+              </Link>
+              <Link
+                href="/sobre"
+                className="text-blog-[#334155] hover:text-[#0f172a] transition-colors font-medium"
+              >
+                Sobre
+              </Link>
+              <Link
+                href="/categorias"
+                className="text-blog-[#334155] hover:text-[#0f172a] transition-colors font-medium"
+              >
+                categorias
               </Link>
               <Command className="bg-white dark:bg-white flex flex-col w-full h-[300px]">
                 <CommandInput className="w-64 fixed top-[145px]" placeholder="🔍 Search..." onValueChange={(e) => setSearchTerm(e)} />
