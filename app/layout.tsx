@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Min joe blog",
-  description: "A blog about web development and other stuff",
+  title: "OKraQPrograma",
+  description: "Um blog sobre desenvolvimento web e outras coisas, aqui você encontrará notícias, artigos e dicas de desenvolvimento web.", 
 };
 
 export default function RootLayout({
