@@ -37,12 +37,12 @@ const Home = () => {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="bg-[#0f172a] text-white py-16 md:py-24">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">OKraQPrograma</h1>
+        <section className="bg-[#0f172a] text-white py-16 md:py-7">
+          <div className="container mx-auto px-2">
+            <div className="max-w-3xl flex flex-col items-center justify-center  mx-auto text-center">
+              <Image alt="logo" src="/logo.png" width={600} height={600} className="w-[350px] h-[300px] opacity-90" />
               <p className="text-xl md:text-2xl text-gray-300 mb-8">
-                Your blog about on technology and lifestyle.
+                Seu blog de tecnologia.
               </p>
             </div>
           </div>
@@ -51,7 +51,7 @@ const Home = () => {
         {/* Featured Post */}
         <section className="py-12 md:py-16 bg-[#f8fafc]">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl font-bold mb-8 text-[#0f172a]">Featured Post</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-8 text-[#0f172a]">Em destaque</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="aspect-video rounded-lg overflow-hidden">
                 <Image
@@ -81,7 +81,7 @@ const Home = () => {
                 </div>
                 <Link href={`/blogpost/${featuredPost.slug}`}>
                   <Button className="bg-[#0f172a] hover:bg-[#0f172a]/90 text-white w-fit">
-                    Read Post <ArrowRight className="ml-2 h-4 w-4" />
+                    Ler Post <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
               </div>
@@ -93,9 +93,9 @@ const Home = () => {
         <section className="py-12 md:py-16">
           <div className="container mx-auto px-4">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-[#0f172a]">Recent Posts</h2>
-              <Link href="/category/all" className="text-[#0ea5e9] hover:text-[#0f172a] transition-colors">
-                View all <ArrowRight className="inline ml-1 h-4 w-4" />
+              <h2 className="text-2xl md:text-3xl font-bold text-[#0f172a]">Posts Recentes</h2>
+              <Link href="/blogpost/recents" className="text-[#0ea5e9] hover:text-[#0f172a] transition-colors">
+                Ver tudo <ArrowRight className="inline ml-1 h-4 w-4" />
               </Link>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -109,14 +109,14 @@ const Home = () => {
         {/* Categories Section */}
         <section className="py-12 md:py-16 bg-[#f8fafc]">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl md:text-3xl font-bold mb-8 text-[#0f172a]">Explore by Category</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-8 text-[#0f172a]">Explorar por Categoria</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {
                 categories.map((category: { label: string; }, index) => (
                   <Link key={index} href="/category/technology" className="bg-white rounded-lg shadow p-8 text-center transition-transform hover:translate-y-[-5px]">
                     <h3 className="text-xl font-semibold mb-2 text-[#0f172a]">{category.label}</h3>
                     <p className="text-blog-[#334155]">
-                      {`Explore the latest articles in ${category.label} category.`}
+                      {`Explore as ultimas publicações da categoria ${category.label}.`}
                     </p>
                   </Link>
                 ))

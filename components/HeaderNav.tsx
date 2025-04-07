@@ -38,7 +38,8 @@ const HeaderNav = () => {
   return (
     <header className="bg-white shadow-sm sticky top-0 z-10">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center max-h-[70px]">
-        <Link href="/" className="text-[#334155] font-semibold text-2xl">
+        <Link href="/" className="text-[#334155] font-semibold text-2xl flex items-center">
+          <Image alt="logo" src="/logo.png" width={600} height={600} className="w-[50px] h-[50px]" />
           OKraQPrograma
         </Link>
 
