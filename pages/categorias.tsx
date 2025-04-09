@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import HeaderNav from "@/components/HeaderNav";
 import Footer from "@/components/Footer";
 import BlogCard from "@/components/BlogCard";
-import { useParams } from "next/navigation";
 import { ArticleItem } from "@/types";
 import Loading from "@/components/Loading";
+import { useRouter } from "next/router";
 
 // Mock categories data
 type category = {
@@ -15,20 +15,32 @@ type category = {
 
 type categories = category[];
 const Category = () => {
-  const params = useParams<{ slug: string }>();
-  const slug = params?.slug || "";
+  // get query params 
+  const query = useRouter().query.category || "";
   const [categories, setCategories] = useState<categories | null>(null);
-
+  const [retries, setRetries] = useState(0)
   useEffect(() => {
-    if (!slug && !categories) {
-      fetch("/api/categories").then(res => res.json()).then(categories => setCategories(categories));
-      return;
+    if (retries < 5) {
+      console.log(query)
+      if (!categories) {
+        fetch("/api/categories").then(res => res.json()).then(categories => setCategories(categories));
+        setRetries((prevRetries) => prevRetries + 1);
+        return
+      }
+
+      if (query !== "" && categories && categories.length > 1) {
+        setCategories((prevCategories) => prevCategories?.filter((cat) => cat.label === query) || []);
+        setRetries((prevRetries) => prevRetries + 1);
+        return
+      }
+
+      if (categories && categories.map(cat => cat.posts).filter(post => post !== undefined).length === 0) {
+        fetch(`/api/posts`).then(res => res.json()).then((articles: { data: ArticleItem[] }) => setCategories((prevCategories) => prevCategories?.map((cat) => cat.value === categories[0].value ? { ...cat, posts: articles.data } : cat) || []));
+        setRetries((prevRetries) => prevRetries + 1);
+        return
+      }
     }
-    // fetch only if the categories[all].posts is empty
-    if (categories && categories.map(cat => cat.posts).flat().filter(post => post !== undefined ).length === 0) {
-      fetch(`/api/posts`).then(res => res.json()).then((articles: { data: ArticleItem[] }) => setCategories((prevCategories) => prevCategories?.map((cat) => cat.value === categories[0].value ? { ...cat, posts: articles.data } : cat) || []));
-    }
-  }, [slug, categories]);
+  }, [query, categories, retries]);
 
   if (!categories) {
     return <Loading />;

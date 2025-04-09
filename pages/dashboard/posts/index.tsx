@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import "../../../app/globals.css";
 import DashboardLayout from "@/layouts/DashboardLayout";
+import AuthGuard from "@/components/AuthGuard";
 
 interface Post {
   id: number;
@@ -134,130 +135,132 @@ const Posts = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex gap-3">
-      <DashboardLayout />
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between md:items-center gap-2">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight">Posts</h2>
-            <p className="text-muted-foreground">Manage your blog posts here.</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search posts..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="pl-8 w-full md:w-[200px] lg:w-[300px]"
-              />
+    <AuthGuard requireAuth={true}>
+      <div className="min-h-screen bg-gray-50 flex gap-3">
+        <DashboardLayout />
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex justify-between md:items-center gap-2">
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight">Posts</h2>
+              <p className="text-muted-foreground">Manage your blog posts here.</p>
             </div>
-            <Link href="/dashboard/create-post">
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                New Post
-              </Button>
-            </Link>
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search posts..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="pl-8 w-full md:w-[200px] lg:w-[300px]"
+                />
+              </div>
+              <Link href="/dashboard/create-post">
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  New Post
+                </Button>
+              </Link>
+            </div>
           </div>
-        </div>
 
-        <Card>
+          <Card>
 
-          <CardHeader>
-            <CardTitle>All Posts</CardTitle>
-            <CardDescription>
-              {filteredPosts.length} posts found
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b text-left">
-                    <th className="pb-3 font-medium">Title</th>
-                    <th className="pb-3 font-medium">Category</th>
-                    <th className="pb-3 font-medium">Status</th>
-                    <th className="pb-3 font-medium">Date</th>
-                    <th className="pb-3 font-medium text-right">Views</th>
-                    <th className="pb-3 font-medium text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredPosts.length > 0 ? (
-                    filteredPosts.map(post => (
-                      <tr key={post.id} className="border-b hover:bg-muted/50">
-                        <td className="py-3 pr-4">
-                          <div>
-                            <Link href={`/dashboard/edit-post/${post.id}`} className="font-medium hover:underline">
-                              {post.title}
+            <CardHeader>
+              <CardTitle>All Posts</CardTitle>
+              <CardDescription>
+                {filteredPosts.length} posts found
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b text-left">
+                      <th className="pb-3 font-medium">Title</th>
+                      <th className="pb-3 font-medium">Category</th>
+                      <th className="pb-3 font-medium">Status</th>
+                      <th className="pb-3 font-medium">Date</th>
+                      <th className="pb-3 font-medium text-right">Views</th>
+                      <th className="pb-3 font-medium text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredPosts.length > 0 ? (
+                      filteredPosts.map(post => (
+                        <tr key={post.id} className="border-b hover:bg-muted/50">
+                          <td className="py-3 pr-4">
+                            <div>
+                              <Link href={`/dashboard/edit-post/${post.id}`} className="font-medium hover:underline">
+                                {post.title}
+                              </Link>
+                              <p className="text-sm text-muted-foreground line-clamp-1 mt-1">
+                                {post.excerpt}
+                              </p>
+                            </div>
+                          </td>
+                          <td className="py-3">
+                            <Link href={`/category/${post.categorySlug}`}>
+                              <Badge variant="outline">{post.category}</Badge>
                             </Link>
-                            <p className="text-sm text-muted-foreground line-clamp-1 mt-1">
-                              {post.excerpt}
-                            </p>
-                          </div>
-                        </td>
-                        <td className="py-3">
-                          <Link href={`/category/${post.categorySlug}`}>
-                            <Badge variant="outline">{post.category}</Badge>
-                          </Link>
-                        </td>
-                        <td className="py-3">
-                          {post.status === "published" ? (
-                            <Badge className="bg-green-500">Published</Badge>
-                          ) : (
-                            <Badge variant="outline">Draft</Badge>
-                          )}
-                        </td>
-                        <td className="py-3">{post.date}</td>
-                        <td className="py-3 text-right">{post.views}</td>
-                        <td className="py-3 text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Actions</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="bg-amber-50" align="end">
-                              <DropdownMenuItem asChild>
-                                <Link href={`/${post.slug}`} className="flex items-center">
-                                  <Eye className="mr-2 h-4 w-4" />
-                                  View
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem asChild>
-                                <Link href={`/dashboard/edit-post/${post.id}`} className="flex items-center">
-                                  <Edit className="mr-2 h-4 w-4" />
-                                  Edit
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                className="text-destructive focus:text-destructive"
-                                onClick={() => handleDeletePost(post.id)}
-                              >
-                                <Trash className="mr-2 h-4 w-4" />
-                                Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          </td>
+                          <td className="py-3">
+                            {post.status === "published" ? (
+                              <Badge className="bg-green-500">Published</Badge>
+                            ) : (
+                              <Badge variant="outline">Draft</Badge>
+                            )}
+                          </td>
+                          <td className="py-3">{post.date}</td>
+                          <td className="py-3 text-right">{post.views}</td>
+                          <td className="py-3 text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                  <span className="sr-only">Actions</span>
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent className="bg-amber-50" align="end">
+                                <DropdownMenuItem asChild>
+                                  <Link href={`/${post.slug}`} className="flex items-center">
+                                    <Eye className="mr-2 h-4 w-4" />
+                                    View
+                                  </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                  <Link href={`/dashboard/edit-post/${post.id}`} className="flex items-center">
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Edit
+                                  </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  className="text-destructive focus:text-destructive"
+                                  onClick={() => handleDeletePost(post.id)}
+                                >
+                                  <Trash className="mr-2 h-4 w-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={6} className="py-6 text-center text-muted-foreground">
+                          No posts found. Try adjusting your search or create a new post.
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={6} className="py-6 text-center text-muted-foreground">
-                        No posts found. Try adjusting your search or create a new post.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </AuthGuard>
   );
 };
 

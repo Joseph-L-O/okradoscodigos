@@ -1,6 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import Loading from './Loading'
 
 export default function AuthGuard({ children, requireAuth = true }: { children: React.ReactNode, requireAuth?: boolean }) {
     const router = useRouter()
@@ -8,7 +9,7 @@ export default function AuthGuard({ children, requireAuth = true }: { children: 
     const [isAllowed, setIsAllowed] = useState(false)
 
     useEffect(() => {
-        const access_token = localStorage.getItem('access_token')
+        const access_token = localStorage.getItem('token')
         const expires_at = localStorage.getItem('expires_at')
         const refresh_token = localStorage.getItem('refresh_token')
 
@@ -60,13 +61,15 @@ export default function AuthGuard({ children, requireAuth = true }: { children: 
             setLoading(false)
             return
         }
-
-        setIsAllowed(true)
-        setLoading(false)
+        if(requireAuth){
+            setIsAllowed(true)
+            setLoading(false)
+            return
+        }
     }, [requireAuth, router])
 
     if (loading) {
-        return <div>Carregando...</div>
+        return <Loading />
     }
 
     if (requireAuth && !isAllowed) {

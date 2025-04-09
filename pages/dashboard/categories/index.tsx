@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import "../../../app/globals.css";
 import DashboardLayout from "@/layouts/DashboardLayout";
+import AuthGuard from "@/components/AuthGuard";
 
 interface Category {
     id: number;
@@ -187,166 +188,168 @@ const Categories = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 flex gap-3">
-            <DashboardLayout />
-            <div className="container mx-auto px-4 py-8 flex-1">
+        <AuthGuard requireAuth={true}>
+            <div className="min-h-screen bg-gray-50 flex gap-3">
+                <DashboardLayout />
+                <div className="container mx-auto px-4 py-8 flex-1">
 
-                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-                    <div>
-                        <h2 className="text-3xl font-bold tracking-tight">Categories</h2>
-                        <p className="text-muted-foreground">Manage your blog categories.</p>
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                        <div>
+                            <h2 className="text-3xl font-bold tracking-tight">Categories</h2>
+                            <p className="text-muted-foreground">Manage your blog categories.</p>
+                        </div>
+                        <Button onClick={handleOpenCreateDialog}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            New Category
+                        </Button>
                     </div>
-                    <Button onClick={handleOpenCreateDialog}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        New Category
-                    </Button>
-                </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>All Categories</CardTitle>
-                        <CardDescription>
-                            {categories.length} categories found
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead>
-                                    <tr className="border-b text-left">
-                                        <th className="pb-3 font-medium">Name</th>
-                                        <th className="pb-3 font-medium">Slug</th>
-                                        <th className="pb-3 font-medium">Description</th>
-                                        <th className="pb-3 font-medium text-right">Posts</th>
-                                        <th className="pb-3 font-medium text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {categories.length > 0 ? (
-                                        categories.map(category => (
-                                            <tr key={category.id} className="border-b hover:bg-muted/50">
-                                                <td className="py-3 pr-4 font-medium">
-                                                    {category.name}
-                                                </td>
-                                                <td className="py-3">
-                                                    <Badge variant="outline">{category.slug}</Badge>
-                                                </td>
-                                                <td className="py-3 max-w-xs">
-                                                    <p className="text-sm text-muted-foreground truncate">
-                                                        {category.description}
-                                                    </p>
-                                                </td>
-                                                <td className="py-3 text-right">{category.postCount}</td>
-                                                <td className="py-3 text-right">
-                                                    <DropdownMenu>
-                                                        <DropdownMenuTrigger asChild>
-                                                            <Button variant="ghost" size="icon">
-                                                                <MoreHorizontal className="h-4 w-4" />
-                                                                <span className="sr-only">Actions</span>
-                                                            </Button>
-                                                        </DropdownMenuTrigger>
-                                                        <DropdownMenuContent align="end"  className="bg-amber-50">
-                                                            <DropdownMenuItem asChild>
-                                                                <a href={`/category/${category.slug}`} target="_blank" rel="noreferrer" className="flex items-center">
-                                                                    <Eye className="mr-2 h-4 w-4" />
-                                                                    View
-                                                                </a>
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem onClick={() => handleOpenEditDialog(category)}>
-                                                                <Edit className="mr-2 h-4 w-4" />
-                                                                Edit
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem
-                                                                className="text-destructive focus:text-destructive"
-                                                                onClick={() => handleDeleteCategory(category.id)}
-                                                            >
-                                                                <Trash className="mr-2 h-4 w-4" />
-                                                                Delete
-                                                            </DropdownMenuItem>
-                                                        </DropdownMenuContent>
-                                                    </DropdownMenu>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>All Categories</CardTitle>
+                            <CardDescription>
+                                {categories.length} categories found
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="border-b text-left">
+                                            <th className="pb-3 font-medium">Name</th>
+                                            <th className="pb-3 font-medium">Slug</th>
+                                            <th className="pb-3 font-medium">Description</th>
+                                            <th className="pb-3 font-medium text-right">Posts</th>
+                                            <th className="pb-3 font-medium text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {categories.length > 0 ? (
+                                            categories.map(category => (
+                                                <tr key={category.id} className="border-b hover:bg-muted/50">
+                                                    <td className="py-3 pr-4 font-medium">
+                                                        {category.name}
+                                                    </td>
+                                                    <td className="py-3">
+                                                        <Badge variant="outline">{category.slug}</Badge>
+                                                    </td>
+                                                    <td className="py-3 max-w-xs">
+                                                        <p className="text-sm text-muted-foreground truncate">
+                                                            {category.description}
+                                                        </p>
+                                                    </td>
+                                                    <td className="py-3 text-right">{category.postCount}</td>
+                                                    <td className="py-3 text-right">
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" size="icon">
+                                                                    <MoreHorizontal className="h-4 w-4" />
+                                                                    <span className="sr-only">Actions</span>
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end" className="bg-amber-50">
+                                                                <DropdownMenuItem asChild>
+                                                                    <a href={`/category/${category.slug}`} target="_blank" rel="noreferrer" className="flex items-center">
+                                                                        <Eye className="mr-2 h-4 w-4" />
+                                                                        View
+                                                                    </a>
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => handleOpenEditDialog(category)}>
+                                                                    <Edit className="mr-2 h-4 w-4" />
+                                                                    Edit
+                                                                </DropdownMenuItem>
+                                                                <DropdownMenuItem
+                                                                    className="text-destructive focus:text-destructive"
+                                                                    onClick={() => handleDeleteCategory(category.id)}
+                                                                >
+                                                                    <Trash className="mr-2 h-4 w-4" />
+                                                                    Delete
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={5} className="py-6 text-center text-muted-foreground">
+                                                    No categories found. Create a new category to get started.
                                                 </td>
                                             </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan={5} className="py-6 text-center text-muted-foreground">
-                                                No categories found. Create a new category to get started.
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                {/* Create/Edit Category Dialog */}
-                <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                    <DialogContent className="bg-amber-50">
-                        <DialogHeader>
-                            <DialogTitle>
-                                {isEditing ? "Edit Category" : "Create Category"}
-                            </DialogTitle>
-                            <DialogDescription>
-                                {isEditing
-                                    ? "Update the category details below."
-                                    : "Fill in the details below to create a new category."}
-                            </DialogDescription>
-                        </DialogHeader>
-
-                        <form onSubmit={handleSubmit}>
-                            <div className="space-y-4 py-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="name">Name <span className="text-destructive">*</span></Label>
-                                    <Input
-                                        id="name"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleInputChange}
-                                        placeholder="Category name"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="slug">Slug <span className="text-destructive">*</span></Label>
-                                    <Input
-                                        id="slug"
-                                        name="slug"
-                                        value={formData.slug}
-                                        onChange={handleInputChange}
-                                        placeholder="category-slug"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="description">Description</Label>
-                                    <Textarea
-                                        id="description"
-                                        name="description"
-                                        value={formData.description}
-                                        onChange={handleInputChange}
-                                        placeholder="Brief description of the category"
-                                        rows={3}
-                                    />
-                                </div>
+                                        )}
+                                    </tbody>
+                                </table>
                             </div>
+                        </CardContent>
+                    </Card>
 
-                            <DialogFooter>
-                                <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
-                                    Cancel
-                                </Button>
-                                <Button type="submit">
-                                    {isEditing ? "Update Category" : "Create Category"}
-                                </Button>
-                            </DialogFooter>
-                        </form>
-                    </DialogContent>
-                </Dialog>
+                    {/* Create/Edit Category Dialog */}
+                    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                        <DialogContent className="bg-amber-50">
+                            <DialogHeader>
+                                <DialogTitle>
+                                    {isEditing ? "Edit Category" : "Create Category"}
+                                </DialogTitle>
+                                <DialogDescription>
+                                    {isEditing
+                                        ? "Update the category details below."
+                                        : "Fill in the details below to create a new category."}
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <form onSubmit={handleSubmit}>
+                                <div className="space-y-4 py-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="name">Name <span className="text-destructive">*</span></Label>
+                                        <Input
+                                            id="name"
+                                            name="name"
+                                            value={formData.name}
+                                            onChange={handleInputChange}
+                                            placeholder="Category name"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="slug">Slug <span className="text-destructive">*</span></Label>
+                                        <Input
+                                            id="slug"
+                                            name="slug"
+                                            value={formData.slug}
+                                            onChange={handleInputChange}
+                                            placeholder="category-slug"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="description">Description</Label>
+                                        <Textarea
+                                            id="description"
+                                            name="description"
+                                            value={formData.description}
+                                            onChange={handleInputChange}
+                                            placeholder="Brief description of the category"
+                                            rows={3}
+                                        />
+                                    </div>
+                                </div>
+
+                                <DialogFooter>
+                                    <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>
+                                        Cancel
+                                    </Button>
+                                    <Button type="submit">
+                                        {isEditing ? "Update Category" : "Create Category"}
+                                    </Button>
+                                </DialogFooter>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
-        </div>
+        </AuthGuard>
     );
 };
 

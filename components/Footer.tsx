@@ -9,6 +9,7 @@ const Footer = () => {
   useEffect(() => {
     fetch("/api/categories").then(res => res.json()).then(categories => setCategories(categories));
   }, []);
+
   return (
     <footer className="bg-[#0f172a] text-white py-12 mt-10">
       <div className="container mx-auto px-4">
@@ -45,6 +46,24 @@ const Footer = () => {
               <li>
                 <Link href="/" className="text-gray-300 hover:text-[#0ea5e9] transition-colors">
                   Início
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/sobre"
+                  className="text-gray-300 hover:text-[#0ea5e9] transition-colors"
+                >
+                  Sobre
+                </Link>
+              </li>
+              <li>
+                <Link href="/categorias" className="text-gray-300 hover:text-[#0ea5e9] transition-colors">
+                  Categorias
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacidade" className="text-gray-300 hover:text-[#0ea5e9] transition-colors">
+                  Privacidade
                 </Link>
               </li>
             </ul>

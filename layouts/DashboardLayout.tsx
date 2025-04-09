@@ -31,7 +31,6 @@ const DashboardLayout = () => {
 
     return (
         <div className="h-[100%] flex bg-background">
-
             <aside
                 className={`bg-[#073246]  md:static md:translate-x-0 h-[100vh] z-30 transition-all duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
                     }`}
