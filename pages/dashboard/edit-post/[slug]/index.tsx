@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
     Card,
     CardContent,
@@ -17,288 +17,302 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Save } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useRouter as useNextRouter } from "next/router";
-import "../../../../app/globals.css";
+import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import DashboardLayout from "@/layouts/DashboardLayout";
+import Image from "next/image";
+import AuthGuard from "@/components/AuthGuard";
+import Loading from "@/components/Loading";
 
-// Mock categories
-const categories = [
-    { value: "technology", label: "Technology" },
-    { value: "design", label: "Design" },
-    { value: "lifestyle", label: "Lifestyle" }
-];
 
-// Mock post data
-const mockPost = {
-    id: 1,
-    title: "The Future of Web Development: Trends to Watch in 2023",
-    slug: "future-web-development-trends-2023",
-    category: "technology",
-    excerpt: "Explore the cutting-edge technologies and methodologies shaping the landscape of web development in the coming year.",
-    content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod, nisl eget aliquam ultricies, nunc nunc ultricies nunc, vitae ultricies nisl nunc eu nunc. Nullam euismod, nisl eget aliquam ultricies, nunc nunc ultricies nunc, vitae ultricies nisl nunc eu nunc.",
-    coverImage: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1172&q=80",
-    status: "published",
-    date: "May 15, 2023"
+type FormData = {
+    id?: string;
+    slug?: string;
+    categorySlug?: string;
+    excerpt?: string;
+    coverImage?: string;
+    title: string;
+    date: string;
+    category: string;
+    contentHtml?: string;
+    createdAt?: string;
+    content?: string;
+    tags?: string[];
+    author?: string;
 };
 
 const EditPost = () => {
-    const nxtrouter = useNextRouter()
-
-    const slug = nxtrouter.query.slug;
     const router = useRouter();
-    const { toast } = useToast();
+    const postSlug = usePathname();
 
-    const [formData, setFormData] = useState({
+    const [categories, setCategories] = useState<{ label: string, value: string }[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isCoverImageChanged, setIsCoverImageChanged] = useState(false);
+    const [formData, setFormData] = useState<FormData>({
+        id: "",
         title: "",
         slug: "",
         category: "",
         excerpt: "",
+        coverImage: "",
         content: "",
-        coverImage: ""
+        date: new Date().toISOString(),
+        categorySlug: "",
+        author: "Joseph",
+        tags: [],
     });
 
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+    useEffect(() => {
+        fetch("/api/categories", { headers: { authorization: `Bearer ${localStorage.getItem("token")}` } })
+            .then((res) => res.json())
+            .then((data) => setCategories(data))
+    }, []);
 
     useEffect(() => {
-        // In a real app, this would be an API call to fetch the post by ID
-        setIsLoading(true);
-
-        // Simulate API call
-        setTimeout(() => {
-            if (slug === mockPost.id.toString()) {
-                setFormData({
-                    title: mockPost.title,
-                    slug: mockPost.slug,
-                    category: mockPost.category,
-                    excerpt: mockPost.excerpt,
-                    content: mockPost.content,
-                    coverImage: mockPost.coverImage
-                });
-            } else {
-                // Post not found, redirect to posts list
-                toast({
-                    title: "Error",
-                    description: "Post not found.",
-                });
-                router.push("/dashboard/posts");
-            }
-            setIsLoading(false);
-        }, 500);
-    }, [slug, router, toast]);
-
-    const handleInputChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-        const { name, value } = e.target;
-
-        // Auto-generate slug from title only if slug is empty or was auto-generated
-        if (name === "title" && (!formData.slug || formData.slug === formData.title.toLowerCase().replace(/[^\w\s]/gi, '').replace(/\s+/g, '-'))) {
-            const slug = value
-                .toLowerCase()
-                .replace(/[^\w\s]/gi, '')
-                .replace(/\s+/g, '-');
-
-            setFormData({
-                ...formData,
-                title: value,
-                slug
-            });
+        if (postSlug) {
+            setIsLoading(true);
+            fetch(`/api/posts?slug=${postSlug.replace("/dashboard/edit-post/", "")}`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            })
+                .then(async (res) => {
+                    return res.json();
+                })
+                .then((data) => {
+                    if (data) {
+                        setFormData(data.data);
+                        setIsLoading(false);
+                    }
+                })
         } else {
-            setFormData({
-                ...formData,
-                [name]: value
-            });
+            setIsLoading(false);
         }
-    };
-
-    const handleSelectChange = (value: string) => {
-        setFormData({
-            ...formData,
-            category: value
-        });
-    };
+    }, [postSlug, router]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
 
-        // Validate form
-        if (!formData.title || !formData.category || !formData.content) {
-            toast({
-                title: "Error",
-                description: "Please fill in all required fields.",
-            });
+        if (!formData.title || !formData.category || !formData.content || !formData.slug || !formData.excerpt) {
             setIsSubmitting(false);
             return;
         }
 
-        // In a real app, this would be an API call to update the post
-        setTimeout(() => {
-            toast({
-                title: "Success",
-                description: "Post updated successfully!",
-            });
-            setIsSubmitting(false);
-            router.push("/dashboard/posts");
-        }, 1000);
+        fetch(`/api/posts`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                "authorization": "Bearer " + localStorage.getItem("token"),
+            },
+            body: JSON.stringify({
+                ...formData,
+                coverImage: isCoverImageChanged ? formData.coverImage : "",
+            }),
+        })
+            .then((res) => {
+                return res.json();
+            })
+            .then((data) => {
+                console.log(data);
+                setIsSubmitting(false);
+            })
     };
 
     if (isLoading) {
-        return <div className="flex items-center justify-center h-64">Loading post data...</div>;
+        return (
+            <AuthGuard requireAuth={true}>
+                <Loading />
+            </AuthGuard>
+        );
     }
 
     return (
-
-        <div className="min-h-screen bg-gray-50 flex gap-3">
-            <DashboardLayout />
-            <div className="container mx-auto px-4 py-8 max-h-[100vh] overflow-y-auto">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h2 className="text-3xl font-bold tracking-tight">Edit Post</h2>
-                        <p className="text-muted-foreground">Edit an existing blog post.</p>
+        <AuthGuard requireAuth={true}>
+            <div className="min-h-screen bg-gray-50 flex gap-3">
+                <DashboardLayout />
+                <div className="container mx-auto px-4 py-8 max-h-[100vh] overflow-y-auto">
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 className="text-3xl font-bold tracking-tight">Edit Post</h2>
+                            <p className="text-muted-foreground">Edit the details of the blog post.</p>
+                        </div>
+                        <Button variant="outline" onClick={() => router.push("/dashboard/posts")} disabled={isSubmitting}>
+                            <ArrowLeft className="mr-2 h-4 w-4" /> Back to Posts
+                        </Button>
                     </div>
-                    <Button variant="outline" onClick={() => router.push("/dashboard/posts")}>
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Posts
-                    </Button>
-                </div>
 
-                <form onSubmit={handleSubmit}>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Post Information</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-6 bg-amber-50">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <Label htmlFor="title">Title <span className="text-destructive">*</span></Label>
-                                    <Input
-                                        id="title"
-                                        name="title"
-                                        value={formData.title}
-                                        onChange={handleInputChange}
-                                        placeholder="Enter post title"
-                                        required
-                                    />
+                    <form onSubmit={handleSubmit}>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Post Information</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="title">Title <span className="text-destructive">*</span></Label>
+                                        <Input
+                                            id="title"
+                                            name="title"
+                                            value={formData?.title}
+                                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                            placeholder="Enter post title"
+                                            required
+                                            disabled={isSubmitting}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="slug">Slug <span className="text-destructive">*</span></Label>
+                                        <Input
+                                            id="slug"
+                                            name="slug"
+                                            value={formData?.slug}
+                                            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                                            placeholder="post-url-slug"
+                                            required
+                                            disabled={isSubmitting}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="category">Category <span className="text-destructive">*</span></Label>
+                                        <Select
+                                            name="category"
+                                            value={formData?.category}
+                                            onValueChange={(value) => setFormData({ ...formData, category: value })}
+                                            required
+                                            disabled={isSubmitting}
+                                        >
+                                            <SelectTrigger id="category">
+                                                <SelectValue placeholder="Select category" />
+                                            </SelectTrigger>
+                                            <SelectContent className="w-64 bg-white">
+                                                {categories.length > 0 ? categories.map((category) => (
+                                                    <SelectItem
+                                                        className="cursor-pointer hover:bg-gray-100"
+                                                        key={category.value}
+                                                        value={category.value}
+                                                    >
+                                                        {category.label}
+                                                    </SelectItem>
+                                                )) : <SelectItem value="loading" disabled>Loading categories...</SelectItem>}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="slug">Slug <span className="text-destructive">*</span></Label>
+                                    <Label htmlFor="coverImage">Cover Image</Label>
                                     <Input
-                                        id="slug"
-                                        name="slug"
-                                        value={formData.slug}
-                                        onChange={handleInputChange}
-                                        placeholder="post-url-slug"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <Label htmlFor="category">Category <span className="text-destructive">*</span></Label>
-                                    <Select
-                                        value={formData.category}
-                                        onValueChange={handleSelectChange}
-                                        required
-                                    >
-                                        <SelectTrigger id="category">
-                                            <SelectValue placeholder="Select category" />
-                                        </SelectTrigger>
-                                        <SelectContent className="bg-amber-50">
-                                            {categories.map(category => (
-                                                <SelectItem
-                                                    key={category.value}
-                                                    value={category.value}
-                                                >
-                                                    {category.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="coverImage">Cover Image URL</Label>
-                                    <Input
+                                        type="file"
                                         id="coverImage"
                                         name="coverImage"
-                                        value={formData.coverImage}
-                                        onChange={handleInputChange}
-                                        placeholder="https://example.com/image.jpg"
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                const reader = new FileReader();
+                                                reader.onloadend = () => {
+                                                    setFormData({ ...formData, coverImage: reader.result as string });
+                                                };
+                                                reader.readAsDataURL(file);
+                                                setIsCoverImageChanged(true);
+                                            }
+                                        }}
+                                        placeholder="Upload cover image"
+                                        disabled={isSubmitting}
+                                    />
+                                    {formData?.coverImage && (
+                                        <div className="mt-2">
+                                            <p className="text-sm text-muted-foreground mb-1">Current Image Preview:</p>
+                                            <Image
+                                                src={formData?.coverImage && formData?.coverImage}
+                                                alt="Cover Preview"
+                                                width={500}
+                                                height={300}
+                                                className="h-auto w-full max-w-md object-cover rounded-md border"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="excerpt">Excerpt <span className="text-destructive">*</span></Label>
+                                    <Textarea
+                                        id="excerpt"
+                                        name="excerpt"
+                                        value={formData?.excerpt}
+                                        onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
+                                        placeholder="Brief summary of the post"
+                                        rows={3}
+                                        required
+                                        disabled={isSubmitting}
                                     />
                                 </div>
-                            </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="excerpt">Excerpt</Label>
-                                <Textarea
-                                    id="excerpt"
-                                    name="excerpt"
-                                    value={formData.excerpt}
-                                    onChange={handleInputChange}
-                                    placeholder="Brief summary of the post"
-                                    rows={3}
-                                />
-                            </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="content">Content <span className="text-destructive">*</span></Label>
+                                    <Textarea
+                                        id="content"
+                                        name="content"
+                                        value={formData?.content}
+                                        onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                                        placeholder="Write your post content here..."
+                                        rows={10}
+                                        required
+                                        disabled={isSubmitting}
+                                    />
+                                </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="content">Content <span className="text-destructive">*</span></Label>
-                                <Textarea
-                                    id="content"
-                                    name="content"
-                                    value={formData.content}
-                                    onChange={handleInputChange}
-                                    placeholder="Write your post content here..."
-                                    rows={10}
-                                    required
-                                />
-                            </div>
-                        </CardContent>
-                        <CardFooter className="flex justify-between border-t px-6 py-4">
-                            <Button
-                                variant="outline"
-                                onClick={() => router.push("/dashboard/posts")}
-                                disabled={isSubmitting}
-                            >
-                                Cancel
-                            </Button>
-                            <div className="flex gap-2">
+                                <div className="space-y-2">
+                                    <Label htmlFor="tags">Tags</Label>
+                                    <Input
+                                        id="tags"
+                                        name="tags"
+                                        value={formData?.tags?.join(", ")}
+                                        onChange={(e) => {
+                                            const tags = e.target.value.split(",").map(tag => tag.trim()).filter(Boolean);
+                                            setFormData(prev => ({ ...prev, tags }));
+                                        }}
+                                        placeholder="Enter tags separated by commas"
+                                        disabled={isSubmitting}
+                                    />
+                                </div>
+                            </CardContent>
+                            <CardFooter className="flex justify-between border-t px-6 py-4">
                                 <Button
-                                    type="submit"
+                                    type="button"
                                     variant="outline"
+                                    onClick={() => router.push("/dashboard/posts")}
                                     disabled={isSubmitting}
                                 >
-                                    Save as Draft
+                                    Cancel
                                 </Button>
-                                <Button
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                >
-                                    <Save className="mr-2 h-4 w-4" />
-                                    Update Post
-                                </Button>
-                            </div>
-                        </CardFooter>
-                    </Card>
-                </form>
+                                <div className="flex gap-2">
+                                    <Button
+                                        type="submit"
+                                        className="bg-blue-600 text-white hover:bg-blue-700"
+                                        disabled={isSubmitting || isLoading}
+                                    >
+                                        {isSubmitting ? (
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        ) : (
+                                            <Save className="mr-2 h-4 w-4" />
+                                        )}
+                                        {isSubmitting ? "Saving..." : "Update Post"}
+                                    </Button>
+                                </div>
+                            </CardFooter>
+                        </Card>
+                    </form>
+                </div>
             </div>
-        </div>
+        </AuthGuard>
     );
 };
-
-export async function getServerSideProps(context: { params: { slug: string } }) {
-    const { slug } = context.params;
-
-    return {
-        props: {
-            params: { slug },
-        },
-    };
-}
 
 export default EditPost;

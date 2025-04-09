@@ -43,7 +43,7 @@ export default function SignIn() {
       localStorage.setItem("refresh_token", JSON.stringify(data?.refresh_token))
       localStorage.setItem("expires_at", JSON.stringify(data?.expires_at))
 
-      router.push("/profile")
+      router.push("/dashboard")
     } catch (error) {
       console.error(error)
       setError(null)

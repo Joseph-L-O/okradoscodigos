@@ -39,7 +39,7 @@ const Home = () => {
         <section className="bg-[#0f172a] text-white py-16 md:py-7">
           <div className="container mx-auto px-2">
             <div className="max-w-3xl flex flex-col items-center justify-center  mx-auto text-center">
-              <Image alt="logo" src="/logo.png" width={600} height={600} className="w-[350px] h-[300px] opacity-90" />
+              <Image alt="logo" src="/logo.png" width={600} height={600} className="w-[450px] h-[400px] opacity-90" />
               <p className="text-xl md:text-2xl text-gray-300 mb-8">
                 Seu blog de tecnologia.
               </p>
